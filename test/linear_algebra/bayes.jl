@@ -33,10 +33,10 @@ cpdB = fit(LinearGaussianCPD, data, :sprinkler, [:rain])
 cpdC = fit(LinearGaussianCPD, data, :grasswet, [:rain,:sprinkler])
 
 bn1 = BayesNet([cpdA, cpdB, cpdC])
-dom = [1]
-codom = [2,3]
+bn1_dom = [1]
+bn1_codom = [2,3]
 
-openbn1 = OpenBayesNet(bn1, dom, codom)
+openbn1 = OpenBayesNet(bn1, bn1_dom, bn1_codom)
 
 
 #Create Equations
@@ -49,14 +49,14 @@ cpdA = fit(StaticCPD{Normal}, data, :mosquito)
 cpdB = fit(LinearGaussianCPD, data, :bird, [:mosquito])
 
 bn2 = BayesNet([cpdA, cpdB])
-dom = [1]
-codom = [2]
+bn2_dom = [1]
+bn2_codom = [2]
 
-openbn2 = OpenBayesNet(bn2, dom, codom)
+openbn2 = OpenBayesNet(bn2, bn2_dom, bn2_codom)
 
-openbn_otimes = otimes(openbn1, openbn2)
-@test dom(openbn_otimes) = dom(openbn1) + dom(openbn2)
-@test codom(openbn_otimes) = codom(openbn1) + codom(openbn2)
+openbn_otimes = Bayes.otimes(openbn1, openbn2)
+@test dom(openbn_otimes).N == dom(openbn1).N + dom(openbn2).N
+@test codom(openbn_otimes).N == codom(openbn1).N + codom(openbn2).N
 
 # @test (f⋅h)*x == h*(f*x)
 # @test (f⊕g)*[x;y] == [f*x; g*y]
